@@ -1,0 +1,19 @@
+read_verilog -sv 04_IMPLEMENTATION/rtl/f07_bad_fixed_priority.sv
+read_verilog -sv 04_IMPLEMENTATION/rtl/f07_rr_arbiter.sv
+read_verilog -sv 04_IMPLEMENTATION/rtl/f07_rr_arbiter_wrapper.sv
+hierarchy -check -top f07_rr_arbiter
+proc
+opt
+fsm
+opt
+memory
+opt
+techmap
+opt
+dfflibmap -liberty /mnt/c/Users/ADMIN/Downloads/EEE703128_Guide4Studentsv2.4/EEE703128_PHAT_CHO_SINH_VIEN_v2.4/01_Bo_cai_dat/BO_CAI_DAT_SINH_VIEN/BO_CAI_DAT_SINH_VIEN/lab0_counter/openlane/runs/RUN_2026.10.21_16.49.56/issue_reproducible/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty /mnt/c/Users/ADMIN/Downloads/EEE703128_Guide4Studentsv2.4/EEE703128_PHAT_CHO_SINH_VIEN_v2.4/01_Bo_cai_dat/BO_CAI_DAT_SINH_VIEN/BO_CAI_DAT_SINH_VIEN/lab0_counter/openlane/runs/RUN_2026.10.21_16.49.56/issue_reproducible/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+setundef -zero
+splitnets
+opt_clean -purge
+tee -o 06_GDSII/synthesis/synth_stat.txt stat -liberty /mnt/c/Users/ADMIN/Downloads/EEE703128_Guide4Studentsv2.4/EEE703128_PHAT_CHO_SINH_VIEN_v2.4/01_Bo_cai_dat/BO_CAI_DAT_SINH_VIEN/BO_CAI_DAT_SINH_VIEN/lab0_counter/openlane/runs/RUN_2026.10.21_16.49.56/issue_reproducible/pdk/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+write_verilog -noattr 06_GDSII/synthesis/netlist.v

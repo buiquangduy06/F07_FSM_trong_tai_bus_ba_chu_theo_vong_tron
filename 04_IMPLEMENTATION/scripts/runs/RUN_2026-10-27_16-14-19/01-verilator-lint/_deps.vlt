@@ -1,0 +1,5 @@
+`verilator_config
+lint_off -rule DECLFILENAME
+lint_off -rule EOFNEWLINE
+lint_off -rule UNDRIVEN -file "/mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/04_IMPLEMENTATION/scripts/runs/RUN_2026-10-27_16-14-19/tmp/11e5d742d75a465ca6618ff7763a1e7a.bb.v"
+lint_off -rule UNUSEDSIGNAL -file "/mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/04_IMPLEMENTATION/scripts/runs/RUN_2026-10-27_16-14-19/tmp/11e5d742d75a465ca6618ff7763a1e7a.bb.v"

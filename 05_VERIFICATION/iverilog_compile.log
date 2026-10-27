@@ -1,0 +1,9 @@
+04_IMPLEMENTATION/rtl/f07_bad_fixed_priority.sv:8: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+04_IMPLEMENTATION/rtl/f07_bad_fixed_priority.sv:8: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+04_IMPLEMENTATION/rtl/f07_bad_fixed_priority.sv:8: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+04_IMPLEMENTATION/rtl/f07_rr_arbiter.sv:26: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+04_IMPLEMENTATION/rtl/f07_rr_arbiter.sv:26: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+04_IMPLEMENTATION/rtl/f07_rr_arbiter.sv:26: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+04_IMPLEMENTATION/rtl/f07_rr_arbiter.sv:26: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+04_IMPLEMENTATION/rtl/f07_rr_arbiter.sv:26: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+04_IMPLEMENTATION/rtl/f07_rr_arbiter.sv:26: sorry: constant selects in always_* processes are not currently supported (all bits will be included).

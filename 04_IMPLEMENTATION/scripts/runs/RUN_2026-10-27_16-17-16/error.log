@@ -1,0 +1,5 @@
+Subprocess had a non-zero exit.
+Last 1 line(s):
+ERROR: Can't guess frontend for input file `--config-in' (missing -f option)!
+
+Full log file: '04_IMPLEMENTATION/scripts/runs/RUN_2026-10-27_16-17-16/05-yosys-jsonheader/yosys-jsonheader.log'

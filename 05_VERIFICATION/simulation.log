@@ -1,0 +1,3 @@
+VCD info: dumpfile f07_tb.vcd opened for output.
+F07 TB completed
+05_VERIFICATION/testbench/f07_tb.sv:93: $finish called at 196 (1s)

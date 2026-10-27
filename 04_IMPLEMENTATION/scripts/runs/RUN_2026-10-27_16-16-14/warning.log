@@ -1,0 +1,3 @@
+1 Lint warnings found.
+The Unmapped Yosys instances metric was not found. Are you sure the relevant step was run?
+The Yosys check errors metric was not found. Are you sure the relevant step was run?

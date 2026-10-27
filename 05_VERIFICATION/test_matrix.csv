@@ -1,0 +1,9 @@
+tc_id,nguon,mo_ta,ket_qua,bang_chung
+TC-001,Charter muc 8,"Một khối xin · hai khối xin · ba khối xin liên tục (kiểm luân phiên) · không khối nào xin",PASS,simulation.log
+TC-002,Charter muc 8,"Bổ sung ít nhất hai ca tự xây dựng; trong đó có ca biên.",PASS,simulation.log
+L0-PY,Tu xay,"Mo hinh chuan Python doc lap",PASS,python_reference_run.log
+L2-SIM,Tu xay,"Mo phong RTL voi testbench tu kiem",PASS,simulation.log
+L3-FF,Charter muc 10,"So cell tuan tu phai phu hop phan loai Charter: Tuần tự",PASS,../06_GDSII/synthesis/synth_stat.txt
+L3-SYN,Tu xay,"RTL tong hop duoc ra standard cell sky130",PASS,../06_GDSII/synthesis/yosys.log
+L4-GATE,Tu xay,"Mo phong gate-level tren netlist",CHUA CHAY,-
+L5-SDF,Tu xay,"Mo phong post-layout co back-annotate SDF",CHUA CHAY,-

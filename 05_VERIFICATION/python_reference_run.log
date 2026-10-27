@@ -1,0 +1,7 @@
+F07 reference model PASS
+Round-robin rotation PASS
+Priority scan PASS
+Single-request service PASS
+Back-to-back re-grant on persistent request PASS
+No-request idle PASS
+Grant stability PASS

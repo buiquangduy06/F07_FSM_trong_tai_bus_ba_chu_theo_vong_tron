@@ -1,0 +1,38 @@
+{
+  "project_id": "F07",
+  "title": "FSM trọng tài bus ba chủ theo vòng tròn",
+  "group": "F · Máy trạng thái hữu hạn (FSM)",
+  "difficulty": "Trung bình",
+  "circuit_type": "Tuần tự",
+  "charter_scale": "~180–260 cell · 1×1 tile",
+  "top_module": "f07_rr_arbiter",
+  "clock_port": "clk",
+  "has_clock": true,
+  "expected_ff_zero": false,
+  "technology": "sky130A",
+  "std_cell_library": "sky130_fd_sc_hd",
+  "liberty_corner": "tt_025C_1v80",
+  "flow": "LibreLane/OpenROAD",
+  "measured": {
+    "sim": "PASS",
+    "pyref": "PASS",
+    "synth": "PASS",
+    "sta": "PASS",
+    "cells": 36,
+    "flip_flops": 7,
+    "area_um2": 327.8144,
+    "critical_path_ns": 1.42,
+    "startpoint": "done",
+    "endpoint": "_63_",
+    "power_total_w": "3.46e-05"
+  },
+  "not_run": [
+    "floorplan",
+    "placement",
+    "routing",
+    "drc",
+    "lvs",
+    "gds"
+  ],
+  "source_dir_origin": "F07_FINAL_MENTOR_PACKAGE_v1_0"
+}

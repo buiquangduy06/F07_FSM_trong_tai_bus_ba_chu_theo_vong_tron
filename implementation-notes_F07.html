@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F07 — FSM trọng tài bus ba chủ theo vòng tròn · Ghi chú thực hiện</title>
+<style>
+:root{
+  --bg:#ffffff; --fg:#1a1d21; --muted:#5c6570; --line:#e3e7eb;
+  --accent:#1f5fa9; --accent-soft:#eef4fb; --code-bg:#f5f7f9;
+  --ok:#137a4d; --ok-bg:#e8f6ee; --warn:#8a5a00; --warn-bg:#fdf4e2;
+  --bad:#a52020; --bad-bg:#fceded; --open:#7a5ba8; --open-bg:#f3eefa;
+  --maxw:960px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15181c; --fg:#e6e9ec; --muted:#98a2ad; --line:#2a2f36;
+    --accent:#6fa8e0; --accent-soft:#1c2733; --code-bg:#1b1f24;
+    --ok:#5cc08d; --ok-bg:#16291f; --warn:#d8a54a; --warn-bg:#2a2314;
+    --bad:#e88b8b; --bad-bg:#2b1a1a; --open:#b79ad6; --open-bg:#241d2e;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15181c; --fg:#e6e9ec; --muted:#98a2ad; --line:#2a2f36;
+  --accent:#6fa8e0; --accent-soft:#1c2733; --code-bg:#1b1f24;
+  --ok:#5cc08d; --ok-bg:#16291f; --warn:#d8a54a; --warn-bg:#2a2314;
+  --bad:#e88b8b; --bad-bg:#2b1a1a; --open:#b79ad6; --open-bg:#241d2e;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 16px 96px}
+header.doc{
+  border-bottom:1px solid var(--line); margin-bottom:28px; padding:36px 0 22px;
+}
+header.doc .eyebrow{
+  font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted); font-weight:600; margin-bottom:10px;
+}
+header.doc h1{font-size:clamp(24px,4.4vw,34px); line-height:1.25; margin:0 0 14px}
+.badges{display:flex; flex-wrap:wrap; gap:7px; margin-top:6px}
+.badge{
+  font-size:12.5px; padding:3px 10px; border-radius:999px;
+  border:1px solid var(--line); color:var(--muted); background:var(--accent-soft);
+  white-space:nowrap;
+}
+.badge.ok{color:var(--ok); background:var(--ok-bg); border-color:transparent}
+.badge.warn{color:var(--warn); background:var(--warn-bg); border-color:transparent}
+.badge.bad{color:var(--bad); background:var(--bad-bg); border-color:transparent}
+.badge.open{color:var(--open); background:var(--open-bg); border-color:transparent}
+nav.toc{
+  border:1px solid var(--line); border-radius:10px; padding:16px 20px;
+  margin:0 0 32px; background:var(--accent-soft);
+}
+nav.toc p{margin:0 0 8px; font-weight:700; font-size:13px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--muted)}
+nav.toc ul{margin:0; padding-left:20px}
+nav.toc li{margin:3px 0}
+nav.toc a{color:var(--fg); text-decoration:none}
+nav.toc a:hover{color:var(--accent); text-decoration:underline}
+nav.toc ul ul{padding-left:18px; font-size:14.5px}
+h2{font-size:22px; margin:40px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--line)}
+h3{font-size:18px; margin:28px 0 8px}
+h4{font-size:16px; margin:22px 0 6px; color:var(--muted)}
+p{margin:12px 0}
+a{color:var(--accent)}
+ul,ol{padding-left:24px}
+li{margin:4px 0}
+code{
+  font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  font-size:.9em; background:var(--code-bg); padding:1.5px 5px; border-radius:4px;
+}
+pre{
+  background:var(--code-bg); border:1px solid var(--line); border-radius:8px;
+  padding:14px 16px; overflow-x:auto; line-height:1.55; font-size:13.5px;
+}
+pre code{background:none; padding:0; font-size:inherit}
+blockquote{
+  margin:16px 0; padding:2px 18px; border-left:3px solid var(--accent);
+  background:var(--accent-soft); border-radius:0 8px 8px 0; color:var(--fg);
+}
+blockquote p{margin:10px 0}
+.tablewrap{overflow-x:auto; margin:16px 0; -webkit-overflow-scrolling:touch}
+table{border-collapse:collapse; width:100%; font-size:14.5px; min-width:420px}
+th,td{border:1px solid var(--line); padding:7px 11px; text-align:left; vertical-align:top}
+th{background:var(--accent-soft); font-weight:650; white-space:nowrap}
+tbody tr:nth-child(even) td{background:color-mix(in srgb, var(--code-bg) 55%, transparent)}
+hr{border:0; border-top:1px solid var(--line); margin:34px 0}
+footer.doc{
+  margin-top:56px; padding-top:18px; border-top:1px solid var(--line);
+  color:var(--muted); font-size:13.5px;
+}
+.themebtn{
+  position:fixed; right:14px; bottom:14px; z-index:10;
+  border:1px solid var(--line); background:var(--bg); color:var(--muted);
+  border-radius:999px; padding:8px 14px; font-size:13px; cursor:pointer;
+}
+.themebtn:hover{color:var(--fg)}
+@media (max-width:640px){
+  .wrap{padding:0 16px 72px}
+  header.doc{padding:26px 0 18px}
+  nav.toc{padding:14px 16px}
+}
+@media print{
+  .themebtn{display:none}
+  nav.toc{break-inside:avoid}
+  pre,table,blockquote{break-inside:avoid}
+  body{font-size:11pt}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="doc">
+  <div class="eyebrow">RTL2GDS · Đề F07 · Ghi chú thực hiện</div>
+  <h1>F07 — FSM trọng tài bus ba chủ theo vòng tròn · Ghi chú thực hiện</h1>
+  <div class="badges"><span class="badge ">🔧 Đã vá và xác minh lại</span><span class="badge ">F · Máy trạng thái hữu hạn (FSM)</span><span class="badge ">Độ khó: Trung bình</span><span class="badge ">Loại mạch: Tuần tự</span><span class="badge ok">Mô phỏng: PASS</span><span class="badge ">Tổng hợp: 36 cell · 7 FF</span><span class="badge ">Đường tới hạn: 1,42 ns</span><span class="badge warn">Physical design: CHƯA CHẠY</span></div>
+</header>
+<nav class="toc"><p>Mục lục</p><ul><li><a href="#1-bai-toan-nay-thuc-chat-la-gi">1. Bài toán này thực chất là gì</a></li><li><a href="#2-ban-chat-ky-thuat-co-che-hoat-dong">2. Bản chất kỹ thuật — cơ chế hoạt động</a></li><li><a href="#3-doc-ma-nguon-rtl-lam-gi-tung-dong-quan-trong">3. Đọc mã nguồn: RTL làm gì, từng dòng quan trọng</a></li><li><a href="#4-vi-sao-chon-kien-truc-nay">4. Vì sao chọn kiến trúc này</a></li><li><a href="#5-cach-thuc-hien-lo-trinh-8-buoc-tu-dac-ta-toi-gdsii">5. Cách thực hiện — lộ trình 8 bước từ đặc tả tới GDSII</a></li><li><a href="#6-so-lieu-that-da-do-duoc-va-cach-doc-chung">6. Số liệu thật đã đo được và cách đọc chúng</a></li><li><a href="#7-tra-loi-cac-cau-hoi-ky-thuat-cua-charter-muc-2">7. Trả lời các câu hỏi kỹ thuật của Charter (mục 2)</a></li><li><a href="#8-tra-loi-cau-phan-tich-rieng-charter-muc-9">8. Trả lời câu phân tích riêng (Charter mục 9)</a></li><li><a href="#9-nhung-cho-sinh-vien-hay-sai-va-cach-phat-hien">9. Những chỗ sinh viên hay sai và cách phát hiện</a></li><li><a href="#10-cau-hoi-mentor-nen-dat-khi-bao-ve">10. Câu hỏi mentor nên đặt khi bảo vệ</a></li><li><a href="#11-gioi-han-da-chung-minh-duoc-gi-chua-chung-minh-duoc-gi">11. Giới hạn: đã chứng minh được gì, chưa chứng minh được gì</a></li></ul></nav>
+<main>
+<hr>
+<h2 id="1-bai-toan-nay-thuc-chat-la-gi">1. Bài toán này thực chất là gì</h2>
+<p>Ba khối chủ dùng chung một bus dữ liệu. Tại một thời điểm chỉ <strong>một</strong> khối được lái bus —
+nếu hai khối cùng lái, đó không chỉ là dữ liệu sai mà là <strong>dòng ngắn mạch thật</strong> giữa hai
+bộ đệm đầu ra.</p>
+<p>Nhưng "chỉ một khối được cấp quyền" mới là nửa dễ của bài toán. Một mạch <code>if (req[0]) ...
+else if (req[1]) ... else if (req[2])</code> thoả nửa đó trong 3 dòng. Nửa khó là <strong>công bằng</strong>:
+nếu M0 xin liên tục, mạch ba dòng kia sẽ <strong>không bao giờ</strong> phục vụ M1 và M2. Đó là bỏ đói
+(starvation), và nó không phải một lỗi hiếm — nó là hành vi mặc định của cách viết tự nhiên
+nhất.</p>
+<p>Gói RTL có sẵn đúng mạch ba dòng đó trong <code>f07_bad_fixed_priority.sv</code>, với ghi chú ở dòng 1:
+<em>"EDUCATIONAL ANTI-PATTERN. Fixed priority is intentionally shown to contrast with
+round-robin."</em> Đặt hai mạch cạnh nhau là cách dạy hiệu quả nhất cho đề này.</p>
+<p>Round-robin giải nửa khó bằng một ý tưởng: giữ một <strong>con trỏ</strong> chỉ ra ai được quét trước, và
+sau mỗi lần phục vụ, đẩy khối vừa được phục vụ <strong>xuống cuối</strong> thứ tự quét.</p>
+<h2 id="2-ban-chat-ky-thuat-co-che-hoat-dong">2. Bản chất kỹ thuật — cơ chế hoạt động</h2>
+<p>Cơ chế gói trong một câu: <strong>thứ tự ưu tiên không cố định trong dây, nó là hàm của một thanh
+ghi 2 bit; và thanh ghi đó chỉ đổi khi một giao dịch hoàn tất.</strong></p>
+<p>Ba tầng điều khiển lồng nhau, có chu kỳ thay đổi rất khác nhau:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Tầng</th>
+<th>Đại lượng</th>
+<th>Đổi khi nào</th>
+<th style="text-align: right;">Ô nhớ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 · giao dịch</td>
+<td><code>state</code> (IDLE/ACTIVE)</td>
+<td>mỗi lần cấp/nhả quyền</td>
+<td style="text-align: right;">1 FF</td>
+</tr>
+<tr>
+<td>2 · chọn</td>
+<td><code>selected_grant</code></td>
+<td><strong>tổ hợp</strong> — đổi liên tục theo <code>req</code></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>3 · công bằng</td>
+<td><code>ptr</code></td>
+<td><strong>chỉ khi <code>done = 1</code></strong></td>
+<td style="text-align: right;">2 FF</td>
+</tr>
+</tbody>
+</table></div>
+<p>Tầng 3 đổi chậm nhất nhưng quyết định tính chất quan trọng nhất. Đây là cấu trúc điển hình
+của mọi bộ trọng tài: <strong>chính sách ở tầng chậm, cơ chế ở tầng nhanh</strong>.</p>
+<p>Chi tiết tinh tế nhất — và là chỗ phân biệt round-robin <strong>thật</strong> với round-robin <strong>hình
+thức</strong> — nằm ở cách con trỏ tiến. RTL viết <code>ptr ← (khối ĐƯỢC PHỤC VỤ + 1) mod 3</code>, không
+phải <code>ptr ← ptr + 1</code>. Khác biệt lộ ra khi <code>ptr = 0</code> mà M0 không xin: M2 được phục vụ, và
+<code>ptr</code> phải nhảy thẳng tới <strong>0</strong> (= (2+1) mod 3), không phải tới 1. Chỉ cách này mới bảo đảm
+khối vừa được phục vụ xuống cuối hàng đợi. Viết <code>ptr+1</code> sẽ để M2 vẫn ở gần đầu và có thể
+được phục vụ lại sớm — công bằng bị phá mà mọi ca kiểm thử đơn giản vẫn PASS.</p>
+<p>Cơ chế thứ hai đáng nói: <strong>quyền không bị cướp</strong>. Trạng thái <code>ACTIVE</code> <strong>hoàn toàn không đọc
+<code>req</code></strong> — đọc kỹ nhánh <code>ACTIVE</code> sẽ thấy <code>req</code> vắng mặt. Nhờ đó một khối đang lái bus không
+bị cắt giữa chừng khi khối khác giơ tay. Đây là lý do <code>busy</code> tồn tại, và là lý do <code>grant</code>
+phải được <strong>đăng ký</strong> chứ không gán thẳng từ logic tổ hợp.</p>
+<p>Cơ chế thứ ba, ít ai để ý: <strong><code>grant</code> đóng hai vai</strong>. Nó vừa là đầu ra, vừa là thanh ghi
+trạng thái lưu "ai đang được phục vụ" — vì <code>case (grant)</code> đọc lại chính nó để tiến <code>ptr</code>.
+Nhờ vậy module không cần thêm thanh ghi <code>served_id</code>, tiết kiệm 2 FF.</p>
+<h2 id="3-doc-ma-nguon-rtl-lam-gi-tung-dong-quan-trong">3. Đọc mã nguồn: RTL làm gì, từng dòng quan trọng</h2>
+<p>Trái tim của round-robin là khối chọn xoay:</p>
+<pre><code class="language-systemverilog">always_comb begin
+    selected_id    = 2'd0;
+    selected_grant = 3'b000;              // ← gán mặc định: chặn suy ra latch
+    case (ptr)
+        2'd0: begin
+            if      (req[0]) begin selected_id=2'd0; selected_grant=3'b001; end
+            else if (req[1]) begin selected_id=2'd1; selected_grant=3'b010; end
+            else if (req[2]) begin selected_id=2'd2; selected_grant=3'b100; end
+        end
+        2'd1: begin   /* thứ tự 1,2,0 */ end
+        default: begin /* thứ tự 2,0,1 — BẮT CẢ ptr=2 LẪN ptr=3 */ end
+    endcase
+end
+</code></pre>
+<p>Ba điều đọc được ngay:</p>
+<ol>
+<li><strong>Ba chuỗi ưu tiên tĩnh, một mux chọn giữa chúng.</strong> "Ưu tiên xoay" trong phần cứng không
+   phải một bộ xoay bit — nó là ba bộ mã hoá ưu tiên viết sẵn, và <code>ptr</code> chọn dùng bộ nào.</li>
+<li><strong><code>default</code> gộp <code>ptr=2</code> và <code>ptr=3</code>.</strong> Đây là một lựa chọn tốt hơn vẻ ngoài: <code>ptr=3</code> là mã
+   bất hợp lệ (2 bit, 3 giá trị dùng), và gộp nó vào một nhánh hợp lệ làm FSM <strong>tự phục
+   hồi</strong>. Nếu viết <code>2'd2:</code> riêng rồi <code>default: selected_grant = 3'b000</code>, thì <code>ptr=3</code> sẽ
+   không cấp quyền cho ai, <code>done</code> không bao giờ tới, <code>ptr</code> không bao giờ được ghi lại —
+   <strong>deadlock</strong>. Cùng một mã bất hợp lệ, hai cách viết, một tự phục hồi và một treo.</li>
+<li><strong>Gán mặc định ở hai dòng đầu</strong> làm khối <code>always_comb</code> đầy đủ với mọi tổ hợp
+   <code>(ptr, req)</code> — 32 tổ hợp — nên không suy ra latch.</li>
+</ol>
+<p>Đoạn thứ hai, nơi công bằng thật sự được thực thi:</p>
+<pre><code class="language-systemverilog">ACTIVE: begin
+    if (done) begin
+        case (grant)                      // ĐỌC grant như trạng thái
+            3'b001: ptr &lt;= 2'd1;
+            3'b010: ptr &lt;= 2'd2;
+            3'b100: ptr &lt;= 2'd0;          // ← WRAP: toàn bộ phần &quot;vòng tròn&quot;
+            default: ptr &lt;= ptr;
+        endcase
+        grant &lt;= 3'b000;  busy &lt;= 1'b0;  state &lt;= IDLE;
+    end
+    // KHÔNG CÓ else — và req không xuất hiện ở đâu trong nhánh này
+end
+</code></pre>
+<p>Việc <strong>không có <code>else</code></strong> là cố ý: trong <code>always_ff</code>, không gán nghĩa là giữ nguyên, sinh mux
+hồi tiếp chứ không sinh latch. Và việc <code>req</code> vắng mặt chính là cơ chế bảo đảm INV-3.</p>
+<p>Cuối cùng, một chi tiết nên dọn: <code>selected_id</code> (dòng 14) được gán ở 7 chỗ nhưng <strong>không bao
+giờ được đọc</strong>, và hàm <code>onehot3</code> (dòng 17–24) <strong>không bao giờ được gọi</strong>. Cả hai là mã chết;
+<code>opt_clean -purge</code> xoá sạch, và netlist xác nhận — không có dây nào tên <code>selected_id</code>. Vô
+hại về phần cứng, nhưng gây hiểu nhầm khi đọc mã.</p>
+<h2 id="4-vi-sao-chon-kien-truc-nay">4. Vì sao chọn kiến trúc này</h2>
+<p>Có ít nhất bốn cách làm trọng tài công bằng (<code>03_ARCHITECTURE/tradeoff.md</code> §2): con trỏ nhị
+phân, mặt nạ xoay one-hot, vòng thẻ bài, ưu tiên động. Với <strong>ba</strong> khối chủ:</p>
+<ul>
+<li><strong>Vòng thẻ bài</strong> thua vì thẻ vẫn đi qua khối không xin, lãng phí chu kỳ. Round-robin quét
+  <strong>bỏ qua</strong> khối không xin.</li>
+<li><strong>Mặt nạ one-hot</strong> tốn 3 FF thay vì 2, đổi lại không cần bộ giải mã. Với 3 khối, con trỏ
+  nhị phân thắng; từ khoảng 8 khối trở lên thì ngược lại.</li>
+<li><strong>Ưu tiên động</strong> nằm ngoài phạm vi (Charter mục 3: đó là đề J10).</li>
+</ul>
+<p>Bên trong kiến trúc con trỏ, quyết định lớn nhất là <strong>Moore thay vì Mealy</strong> — đăng ký
+<code>grant</code> và <code>busy</code> thay vì để chúng tổ hợp. Cái giá đo được: <strong>7 FF</strong> thay vì ≈3, và thêm
+1 chu kỳ độ trễ. Charter mục 10 dự đoán 3–5 FF, tức ngầm giả định Mealy.</p>
+<p>Vì sao Moore vẫn đúng: <code>grant</code> mở bộ đệm ba trạng thái lên bus chung. Một glitch rộng 200 ps
+trên hai bit <code>grant</code> cùng lúc tạo dòng ngắn mạch thật, không chỉ dữ liệu sai. Với loại tín
+hiệu này, "không glitch" đáng hơn 4 flip-flop. <strong>Đây là đánh đổi mà chỉ hiểu bối cảnh ứng
+dụng mới quyết định đúng được</strong> — nhìn thuần số liệu thì Mealy thắng.</p>
+<h2 id="5-cach-thuc-hien-lo-trinh-8-buoc-tu-dac-ta-toi-gdsii">5. Cách thực hiện — lộ trình 8 bước từ đặc tả tới GDSII</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Bước</th>
+<th>Việc</th>
+<th>Trạng thái F07</th>
+<th>Bằng chứng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Bảng hành vi + invariant từ Charter</td>
+<td>✅</td>
+<td><code>functional_spec.md</code> §2, §4</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Mô hình chuẩn Python độc lập</td>
+<td>✅ PASS 5 ca</td>
+<td><code>python_reference_run.log</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>RTL mô tả tường minh FSM + con trỏ</td>
+<td>✅</td>
+<td><code>f07_rr_arbiter.sv</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Testbench tự kiểm</td>
+<td>⚠️ <strong>FATAL t=156 — lỗi testbench</strong></td>
+<td><code>known_issues.md</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Tổng hợp, đọc <code>synth_stat</code></td>
+<td>✅ 36 cell · 7 FF · 327,8144 µm²</td>
+<td><code>synth_stat.txt</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>STA, đọc đường tới hạn</td>
+<td>✅ <code>done → ptr[0]</code>, 1,42 ns, slack 8,46</td>
+<td><code>timing_report_max.txt</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Ước lượng công suất</td>
+<td>✅ 3,46e-05 W</td>
+<td><code>power_report.txt</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>P&amp;R → DRC → LVS → GDS</td>
+<td>⬜ chưa chạy</td>
+<td><code>physical_report.md</code> §1</td>
+</tr>
+</tbody>
+</table></div>
+<p>Khác với F06, chuỗi bằng chứng của F07 <strong>không bị đứt</strong>: <code>f07_tb.sv</code> dòng 7 và <code>synth.ys</code>
+dòng 4 dùng <strong>cùng</strong> top module <code>f07_rr_arbiter</code>. Số liệu cấu trúc thuộc về đúng mạch đã
+được mô phỏng.</p>
+<h2 id="6-so-lieu-that-da-do-duoc-va-cach-doc-chung">6. Số liệu thật đã đo được và cách đọc chúng</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Chỉ số</th>
+<th style="text-align: right;">Giá trị</th>
+<th>Nguồn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Số cell</td>
+<td style="text-align: right;"><strong>36</strong></td>
+<td><code>synth_stat.txt</code></td>
+</tr>
+<tr>
+<td>Flip-flop</td>
+<td style="text-align: right;"><strong>7</strong></td>
+<td>như trên</td>
+</tr>
+<tr>
+<td>Diện tích</td>
+<td style="text-align: right;"><strong>327,8144 µm²</strong></td>
+<td>như trên</td>
+</tr>
+<tr>
+<td>Startpoint → Endpoint</td>
+<td style="text-align: right;"><code>done</code> → <code>_63_</code> (= <code>ptr[0]</code>)</td>
+<td><code>sta/summary.txt</code></td>
+</tr>
+<tr>
+<td>Data arrival</td>
+<td style="text-align: right;"><strong>1,42 ns</strong></td>
+<td><code>timing_report_max.txt</code></td>
+</tr>
+<tr>
+<td>Slack</td>
+<td style="text-align: right;"><strong>8,46 ns (MET)</strong></td>
+<td>như trên</td>
+</tr>
+<tr>
+<td>WNS / TNS</td>
+<td style="text-align: right;">0,00 / 0,00</td>
+<td><code>wns.txt</code>, <code>tns.txt</code></td>
+</tr>
+<tr>
+<td>Công suất</td>
+<td style="text-align: right;"><strong>3,46e-05 W</strong> — tuần tự 88,3 %, tổ hợp 11,7 %</td>
+<td><code>power_report.txt</code></td>
+</tr>
+<tr>
+<td>Mô phỏng RTL</td>
+<td style="text-align: right;">RAN_WITH_ISSUES — FATAL t=156</td>
+<td><code>simulation.log</code></td>
+</tr>
+<tr>
+<td>Mô hình chuẩn Python</td>
+<td style="text-align: right;">PASS</td>
+<td><code>python_reference_run.log</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Ánh xạ 7 flip-flop sang tín hiệu</strong> (đọc từ <code>netlist.v</code> dòng 214–248):
+<code>_58_</code>→<code>state</code>, <code>_59_ _60_ _61_</code>→<code>grant[0..2]</code>, <code>_62_</code>→<code>busy</code>, <code>_63_ _64_</code>→<code>ptr[0..1]</code>.</p>
+<p><strong>Những số này chứng minh gì:</strong></p>
+<ul>
+<li>Mạch tổng hợp được ra <code>sky130_fd_sc_hd</code> thật, 7 FF ⟹ đúng phân loại "Tuần tự".</li>
+<li><code>grant</code> và <code>busy</code> là <strong>đầu ra đăng ký</strong>: chân <code>Q</code> nối <strong>thẳng</strong> ra cổng, không cổng tổ hợp
+  nào ở giữa ⟹ bằng chứng mức netlist rằng đây là máy <strong>Moore</strong>.</li>
+<li>Round-robin hiện thành <strong>2 flip-flop <code>ptr</code> thật</strong> — trả lời Charter mục 2 câu 1 bằng phần
+  cứng, không phải bằng lời.</li>
+<li>Không có đường timing âm ở chu kỳ giả định 10 ns, góc <code>tt_025C_1v80</code>, <strong>sau tổng hợp</strong>.</li>
+</ul>
+<p><strong>Những số này KHÔNG chứng minh gì:</strong></p>
+<ol>
+<li><strong>1,42 ns không phải độ trễ logic.</strong> 1,00 ns trong đó là <code>set_input_delay</code> <strong>giả định</strong>
+   từ <code>design.sdc</code>; logic thật chỉ <strong>0,42 ns</strong> (3 cell: 0,19 + 0,18 + 0,05).</li>
+<li><strong>Slack 8,46 ns không dịch thành tần số.</strong> Chưa P&amp;R, chưa có ký sinh dây, một góc PVT.</li>
+<li><strong>Đường tới hạn có thể đổi nếu SDC đổi.</strong> <code>done</code> là cổng vào nên mang 1,0 ns giả định;
+   khối chọn xoay bắt đầu từ FF <code>ptr</code>, nên arrival của nó chỉ bằng <code>t_ckq</code> — nhỏ hơn 1,0 ns
+   rất nhiều. Chênh lệch điểm xuất phát đó đủ để đảo thứ hạng. Một phần "đường tới hạn" là
+   hệ quả của <strong>cách ràng buộc</strong>, không phải của mạch. (Giá trị <code>t_ckq</code> của <code>_63_</code> ⬜ chưa
+   có — STA của F07 chỉ báo các đường <code>input → FF</code>.)</li>
+<li><strong>36 cell không so được với <code>f07_bad_fixed_priority</code></strong> cho tới khi module đó được tổng
+   hợp — và ngay cả khi có số, phép so vẫn không công bằng (§8).</li>
+<li><strong>7 FF không chứng minh <code>grant</code> luôn one-hot.</strong> Sau tổng hợp, ba bit là ba FF độc lập;
+   one-hot chỉ đúng nhờ logic điều khiển, không nhờ cấu trúc. Cần mô phỏng gate-level.</li>
+</ol>
+<p><strong>Phát hiện đáng chú ý nhất:</strong> đường tới hạn kết thúc ở <strong><code>ptr[0]</code></strong>, và đường chậm thứ hai
+(slack cũng 8,46 ns) kết thúc ở <strong><code>ptr[1]</code></strong>. Hai đường chậm nhất của toàn thiết kế đều là
+đường cập nhật con trỏ công bằng. Nói cách khác, <strong>giá của công bằng phải trả bằng cả diện
+tích lẫn timing</strong> — và phần timing thì đã đo được ngay hôm nay.</p>
+<h2 id="7-tra-loi-cac-cau-hoi-ky-thuat-cua-charter-muc-2">7. Trả lời các câu hỏi kỹ thuật của Charter (mục 2)</h2>
+<p><strong>Câu 1 — <em>"Round-robin hiện ra trong phần cứng dưới dạng gì — con trỏ quay hay ưu tiên
+xoay?"</em></strong>
+<strong>Cả hai, và chúng là hai bộ phận khác nhau.</strong> Con trỏ quay hiện thành <strong>2 flip-flop</strong>
+(<code>netlist.v</code> dòng 239–248). Ưu tiên xoay hiện thành <strong>logic tổ hợp</strong> — ba bộ mã hoá ưu tiên
+viết sẵn trong <code>case (ptr)</code>, được chọn bởi con trỏ. Con trỏ là <strong>trạng thái</strong>; ưu tiên xoay
+là <strong>hàm của trạng thái đó</strong>. Không có con trỏ thì không có ký ức về lượt; không có ưu tiên
+xoay thì con trỏ vô dụng.</p>
+<p><strong>Câu 2 — <em>"Bằng chứng nào chứng minh không khối nào bị bỏ đói khi cả ba xin liên tục?"</em></strong>
+Hai bằng chứng độc lập, cộng một chứng minh hình thức:
+(a) <strong>RTL</strong>: TB dòng 39, 44, 49, 54 với <code>req=3'b111</code> liên tục — chuỗi phục vụ <code>M0→M1→M2→M0</code>,
+cả bốn assertion <strong>PASS</strong> (t=36…96, trước khi mô phỏng dừng ở t=156).
+(b) <strong>Python</strong>: <code>test_all_request_rotation()</code> chạy 9 giao dịch, <code>served == [0,1,2]×3</code> PASS.
+(c) <strong>Chứng minh</strong>: mỗi giao dịch đẩy khối vừa phục vụ xuống cuối <code>scan</code>; có 2 khối khác ⟹
+chặn trên <strong>2 giao dịch</strong> (<code>functional_spec.md</code> §6).
+⚠️ Bảo đảm này <strong>có điều kiện</strong>: nó chỉ đúng khi mọi khối chủ phát <code>done</code>. RTL <strong>không có
+timeout</strong> — xem §11.</p>
+<p><strong>Câu 3 — <em>"Chỉ một khối được cấp quyền tại một thời điểm — chứng minh bằng gì?"</em></strong>
+Ba tầng, độ mạnh tăng dần: (a) hành vi — <code>assert($onehot0(grant))</code> ×3, PASS;
+(b) cấu trúc RTL — <code>selected_grant</code> chỉ nhận hằng one-hot hoặc <code>000</code>, không có phép OR nào
+giữa các bit; (c) gate-level — ⬜ <strong>chưa kiểm</strong>, và đây là tầng quan trọng nhất vì sau tổng
+hợp ba bit <code>grant</code> là ba FF độc lập.</p>
+<h2 id="8-tra-loi-cau-phan-tich-rieng-charter-muc-9">8. Trả lời câu phân tích riêng (Charter mục 9)</h2>
+<blockquote>
+<p><em>"Chứng minh bằng mô phỏng rằng không khối nào bị bỏ đói… Nêu phần logic nào bảo đảm tính
+chất đó, và nó tốn thêm bao nhiêu cell so với trọng tài ưu tiên cố định."</em></p>
+</blockquote>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Phần</th>
+<th>Trạng thái</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(a) Chứng minh bằng mô phỏng</td>
+<td>✅ <strong>ĐÃ CÓ</strong> — §7 câu 2</td>
+</tr>
+<tr>
+<td>(b) Phần logic nào bảo đảm</td>
+<td>✅ <strong>ĐÃ CÓ</strong> — <code>ptr</code> (2 FF) + <code>case (grant)</code> dòng 67–72 + <code>case (ptr)</code> dòng 30–46</td>
+</tr>
+<tr>
+<td>(c) Tốn thêm bao nhiêu cell</td>
+<td>⬜ <strong>CHƯA ĐO</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Phần (c) chưa có số vì <code>synth.ys</code> dòng 4 đặt top là <code>f07_rr_arbiter</code>, nên
+<code>f07_bad_fixed_priority</code> bị loại khỏi thiết kế và không xuất hiện trong <code>synth_stat.txt</code>.</p>
+<p><strong>Và ở đây có một cái bẫy phải nói rõ:</strong> ngay cả khi tổng hợp <code>f07_bad_fixed_priority</code> rồi
+lấy <code>36 − (số cell của nó)</code>, con số đó <strong>không phải</strong> giá của round-robin. Hai module không
+cùng chức năng: phản ví dụ <strong>không có</strong> <code>done</code>, <strong>không có</strong> <code>busy</code>, <strong>không</strong> giữ quyền qua
+nhiều chu kỳ, <code>grant</code> <strong>tổ hợp</strong> (0 flip-flop). Phần lớn chênh lệch đến từ <strong>cơ chế giao
+dịch</strong>, không phải từ công bằng.</p>
+<p>Phép so đúng cần một module <strong>thứ ba</strong> chưa tồn tại: cùng FSM <code>IDLE/ACTIVE</code>, cùng <code>grant</code>/
+<code>busy</code> đăng ký, nhưng bỏ <code>ptr</code> và dùng ưu tiên cố định. Chênh lệch khi đó ≈ <strong>2 FF + hai bộ
+mã hoá ưu tiên phụ + mux 3 chiều</strong>. Thiết kế đúng thí nghiệm so sánh có lẽ đáng học hơn cả
+con số.</p>
+<p>Một phần câu trả lời <strong>đã có sẵn</strong> và hay bị bỏ qua: giá của công bằng không chỉ là cell mà
+còn là <strong>timing</strong> — hai đường chậm nhất của thiết kế đều là đường <code>done → ptr</code>, 0,42 ns
+logic thật. Trọng tài ưu tiên cố định không có đường này.</p>
+<h2 id="9-nhung-cho-sinh-vien-hay-sai-va-cach-phat-hien">9. Những chỗ sinh viên hay sai và cách phát hiện</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Sai lầm</th>
+<th>Hậu quả</th>
+<th>Phát hiện bằng bằng chứng nào</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong><code>ptr &lt;= ptr + 1</code></strong> thay vì tiến theo khối được phục vụ</td>
+<td>Round-robin <strong>hình thức</strong>: khối vừa phục vụ vẫn ở gần đầu hàng đợi</td>
+<td>Ca <code>ptr=1</code>, <code>req=3'b101</code>: phải phục vụ M2 rồi <code>ptr←0</code>. Nếu <code>ptr←2</code> là sai. Python <code>test_priority_scan()</code> kiểm đúng điều này.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Test một và hai khối rồi kết luận đúng</strong></td>
+<td>Không phân biệt được round-robin với ưu tiên cố định</td>
+<td>Charter mục 10 cảnh báo đúng chỗ này. Chỉ assertion dòng 44 (<code>expected M1 second</code>) mới lộ.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Để <code>ACTIVE</code> đọc <code>req</code></strong></td>
+<td>Cướp quyền giữa giao dịch ⟹ hỏng dữ liệu bus</td>
+<td>TB dòng 57–59: hạ <code>req</code> về <code>000</code> khi đang <code>ACTIVE</code>, <code>grant</code> phải <strong>không đổi</strong>.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Gán <code>grant</code> tổ hợp</strong> để tiết kiệm FF</td>
+<td>Glitch trên đường cấp quyền bus ⟹ nguy cơ tranh chấp điện</td>
+<td>Đọc netlist: chân <code>Q</code> của FF phải nối <strong>thẳng</strong> ra cổng <code>grant</code>. Nếu có cổng logic ở giữa là Mealy.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Sửa DUT khi testbench FAIL</strong></td>
+<td>Phá một mạch đang đúng; giảm thông lượng bus 33 %</td>
+<td>Truy vết từng chu kỳ tới đúng <code>Time: 156</code> rồi đối chiếu đặc tả §2.1. Xem <code>known_issues.md</code> §4.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Đọc cảnh báo <code>sorry:</code> thành nguyên nhân lỗi</strong></td>
+<td>Kết luận sai hoàn toàn về nguyên nhân</td>
+<td><code>sorry:</code> ≠ <code>error:</code>. Bằng chứng: mô phỏng chạy qua 11 assertion trước khi dừng. <code>known_issues.md</code> §3.</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Quên <code>default</code> trong <code>always_comb</code></strong></td>
+<td>Suy ra latch trong khối chọn</td>
+<td>Tìm cell <code>dlxtp</code>/<code>dlatch</code> trong <code>synth_stat.txt</code>; đọc cảnh báo latch trong <code>yosys.log</code>.</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Viết <code>2'd2:</code> riêng rồi <code>default: grant=0</code></strong></td>
+<td><code>ptr=3</code> ⟹ <strong>deadlock</strong> vĩnh viễn</td>
+<td>Ép <code>force dut.ptr = 2'd3</code> rồi chạy — FSM phải tự phục hồi sau 1 giao dịch. <code>fsm.md</code> §6.2.</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Báo "round-robin tốn thêm 36 cell"</strong> sau khi so với phản ví dụ</td>
+<td>Kết luận sai — phần lớn chênh lệch là cơ chế giao dịch</td>
+<td>So bảng cổng hai module: phản ví dụ không có <code>done</code>, <code>busy</code>, 0 FF. §8.</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Tin <code>grant</code> one-hot vì RTL gán hằng số</strong></td>
+<td>Sau tổng hợp, 3 bit là 3 FF độc lập — one-hot không còn được cấu trúc bảo đảm</td>
+<td>Phải mô phỏng gate-level với assertion <code>$onehot0</code>. ⬜ chưa chạy.</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Quên rằng bảo đảm không bỏ đói là CÓ ĐIỀU KIỆN</strong></td>
+<td>Phát biểu vượt mức</td>
+<td>Không có timeout trong RTL. Một khối chủ treo ⟹ bỏ đói tuyệt đối. <code>control.md</code> §7.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="10-cau-hoi-mentor-nen-dat-khi-bao-ve">10. Câu hỏi mentor nên đặt khi bảo vệ</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Câu hỏi</th>
+<th>Đáp án mong đợi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Chỉ ra <strong>flip-flop</strong> nào trong netlist mang tính công bằng.</td>
+<td><code>_63_</code> và <code>_64_</code> — <code>ptr[0]</code>, <code>ptr[1]</code>. Netlist dòng 239–248.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Vì sao <code>ptr</code> tiến theo <code>grant</code> chứ không theo <code>ptr+1</code>?</td>
+<td>Để đẩy khối <strong>vừa được phục vụ</strong> xuống cuối. Nếu <code>ptr=0</code>, M0 không xin, M2 được phục vụ, thì <code>ptr</code> phải về 0 — <code>ptr+1</code> cho 1, sai.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Trạng thái <code>ACTIVE</code> đọc <code>req</code> ở đâu?</td>
+<td><strong>Không đọc ở đâu cả.</strong> Đó chính là cơ chế "quyền không bị cướp". Kiểm bằng TB dòng 57–59.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Máy này Mealy hay Moore? Bằng chứng mạnh nhất?</td>
+<td><strong>Moore.</strong> Bằng chứng mạnh nhất ở <strong>netlist</strong>: <code>Q</code> của <code>_59_.._62_</code> nối thẳng ra <code>grant</code>/<code>busy</code>, không cổng nào ở giữa. STA cũng không báo đường in→out nào.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Charter dự đoán 3–5 FF, đo được 7. Giải thích.</td>
+<td>Charter ngầm giả định <code>grant</code> tổ hợp (Mealy). RTL đăng ký <code>grant</code> (3 FF) + <code>busy</code> (1) + <code>state</code> (1) + <code>ptr</code> (2) = 7. Không phải lỗi — là đánh đổi chống glitch trên bus.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>ptr = 3</code> có xảy ra không? Nếu có thì sao?</td>
+<td>Không xảy ra (INV-5): reset đặt 0, mọi gán chỉ sinh 0/1/2. Nếu bị ép, <code>default</code> của <code>case (ptr)</code> dùng thứ tự <code>2,0,1</code> ⟹ vẫn cấp quyền, tự phục hồi sau 1 giao dịch.</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Đường tới hạn đi từ đâu tới đâu, và vì sao là đường đó?</td>
+<td><code>done → o311a_1 → mux2i_1 → isobufsrc → ptr[0]</code>, 1,42 ns. Vì <code>done</code> là cổng vào (mang 1,0 ns input delay giả định) và cổng phức hợp trên đường này đắt hơn cổng đơn. Khối chọn xoay bị <code>abc</code> gộp thành cổng phức hợp nên nông hơn dự đoán.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Mô phỏng FAIL ở dòng 72. Ai sai — DUT, mô hình chuẩn, hay testbench?</td>
+<td><strong>Testbench.</strong> <code>req=3'b100</code> không được hạ trước khi kiểm <code>grant==000</code>; DUT cấp lại đúng đặc tả. Mô hình Python <strong>đồng ý với DUT</strong>. Truy vết tới đúng <code>Time: 156</code>.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Vì sao assertion gần như giống hệt ở dòng 63 lại PASS?</td>
+<td>Vì dòng 57 đã hạ <code>req</code> về <code>000</code> — vì một mục đích khác. Dòng 63 PASS <strong>một cách tình cờ</strong>.</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Bằng chứng round-robin có còn giá trị khi mô phỏng FAIL không?</td>
+<td><strong>Có.</strong> Bốn assertion dòng 39–54 đã chạy PASS <strong>trước</strong> t=156. Phần mất là assertion phục hồi sau reset (dòng 74–80).</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Nếu một khối chủ không bao giờ phát <code>done</code> thì sao?</td>
+<td>Bus <strong>treo vĩnh viễn</strong>, hai khối kia bỏ đói tuyệt đối. RTL không có timeout. Bảo đảm công bằng là <strong>có điều kiện</strong>.</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Muốn mở rộng lên 8 khối chủ thì đổi gì?</td>
+<td><code>ptr</code> lên 3 bit; <code>case (ptr)</code> lên 8 nhánh — <strong>bùng nổ</strong>. Lúc đó nên chuyển sang <strong>mặt nạ one-hot xoay</strong>: chi phí tuyến tính thay vì nhân bản 8 bộ mã hoá ưu tiên.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="11-gioi-han-da-chung-minh-duoc-gi-chua-chung-minh-duoc-gi">11. Giới hạn: đã chứng minh được gì, chưa chứng minh được gì</h2>
+<p><strong>Đã chứng minh:</strong></p>
+<ul>
+<li><strong>Round-robin đúng trên RTL thật</strong>: chuỗi <code>M0→M1→M2→M0</code> với ba khối xin liên tục, 4
+  assertion PASS (t=36…96). Đây là nội dung chính của Charter mục 9 phần (a).</li>
+<li><strong>Quyền không bị cướp</strong>: <code>grant</code> giữ nguyên khi <code>req</code> về <code>000</code> giữa giao dịch (t=106).</li>
+<li><strong>One-hot</strong> ở cả ba lần cấp quyền, ở mức hành vi.</li>
+<li>Mô hình chuẩn Python độc lập PASS 5 ca, trong đó có ca 9 giao dịch liên tiếp.</li>
+<li>Tổng hợp ra 36 cell sky130 thật, 7 FF, 327,8144 µm²; STA MET với slack 8,46 ns ở chu kỳ
+  giả định 10 ns, góc <code>tt_025C_1v80</code>, <strong>sau tổng hợp</strong>.</li>
+<li><strong>Máy là Moore</strong> — bằng chứng mức netlist.</li>
+<li><strong>Con trỏ là 2 flip-flop thật</strong>, không phải khái niệm trừu tượng.</li>
+</ul>
+<p><strong>Chưa chứng minh — và không được nói là đã:</strong></p>
+<ul>
+<li><strong>Phục hồi sau reset giữa chừng</strong>: TB dòng 74–80 chưa chạy tới (dừng t=156).</li>
+<li><strong>Giá của công bằng tính bằng cell</strong>: Charter mục 9 phần (c) ⬜ chưa đo, và cần một thí
+  nghiệm so sánh được thiết kế đúng (§8).</li>
+<li><strong><code>grant</code> one-hot ở mức gate</strong>: sau tổng hợp là 3 FF độc lập; chưa mô phỏng gate-level.</li>
+<li><strong>Hành vi khi <code>ptr = 3</code></strong>: không tạo được bằng kích thích ở cổng vào; cần <code>force</code>.</li>
+<li><strong>Yêu cầu Charter mục 4 chưa thoả</strong>: thiếu cổng <code>uo_out[4:3]</code> cho <code>ptr</code>; thừa cổng <code>done</code>
+  không có trong ngân sách chân. Đánh dấu <strong>CHƯA THOẢ</strong> ở <code>functional_spec.md</code>.</li>
+<li><strong>Không có bảo vệ khi khối chủ treo</strong>: không timeout, không watchdog. Tính công bằng là
+  bảo đảm <strong>có điều kiện</strong>, và điều kiện đó chưa được ghi ở tầng đặc tả tự sinh.</li>
+<li>Netlist tương đương RTL; độ trễ sau routing; biên qua các góc PVT; DRC/LVS/GDS: ⬜.</li>
+</ul>
+<p><strong>Hành động đề xuất, chờ thầy duyệt</strong> (hồ sơ không tự sửa RTL/testbench): áp dụng bản vá
+<code>known_issues.md</code> §7.2 (biến lỗi thành hai ca kiểm thử), chạy lại mô phỏng cho hết, tổng hợp
+module so sánh thứ ba để trả lời Charter mục 9 phần (c), bổ sung INV-2/INV-4/INV-5 vào
+<code>properties.sv</code>, và quyết định về hai vấn đề kiến trúc: cổng <code>ptr</code> còn thiếu và cơ chế
+timeout.</p>
+<hr>
+<p><em>Phiên bản: v1.0 · Ngày: 2026-09-24</em></p>
+</main>
+<footer class="doc">
+  Tài liệu sinh từ <code>implementation-notes_F07.md</code>.
+  Mọi số liệu đều kèm công cụ, phiên bản và lệnh tái lập trong
+  <code>07_TRACEABILITY/evidence_index.md</code>.
+</footer>
+</div>
+<script>
+(function(){
+  var b=document.createElement('button');
+  b.className='themebtn'; b.type='button';
+  function lbl(){var t=document.documentElement.getAttribute('data-theme');
+    return t==='dark'?'Nen sang':(t==='light'?'Nen toi':'Doi nen');}
+  b.textContent=lbl();
+  try{var s=localStorage.getItem('rtl2gds-theme'); if(s)document.documentElement.setAttribute('data-theme',s);}catch(e){}
+  b.textContent=lbl();
+  b.addEventListener('click',function(){
+    var cur=document.documentElement.getAttribute('data-theme');
+    var mq=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var next=cur?(cur==='dark'?'light':'dark'):(mq?'light':'dark');
+    document.documentElement.setAttribute('data-theme',next);
+    try{localStorage.setItem('rtl2gds-theme',next);}catch(e){}
+    b.textContent=lbl();
+  });
+  document.body.appendChild(b);
+})();
+</script>
+</body>
+</html>

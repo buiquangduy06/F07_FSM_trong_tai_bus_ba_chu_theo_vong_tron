@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/oss-cad-suite/lib/python3.11/site-packages/librelane/__main__.py", line 41, in <module>
+    from .state import State, DesignFormat
+  File "/mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/oss-cad-suite/lib/python3.11/site-packages/librelane/state/__init__.py", line 24, in <module>
+    from .state import State, InvalidState, StateElement
+  File "/mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/oss-cad-suite/lib/python3.11/site-packages/librelane/state/state.py", line 29, in <module>
+    from ..common import (
+  File "/mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/oss-cad-suite/lib/python3.11/site-packages/librelane/common/__init__.py", line 59, in <module>
+    from .toolbox import Toolbox
+  File "/mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/oss-cad-suite/lib/python3.11/site-packages/librelane/common/toolbox.py", line 38, in <module>
+    import libparse
+  File "/mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/oss-cad-suite/lib/python3.11/site-packages/libparse/__init__.py", line 1, in <module>
+    from _libparse import LibertyAst, LibertyParser
+ImportError: /mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/oss-cad-suite/lib/libc.so.6: version `GLIBC_ABI_DT_X86_64_PLT' not found (required by /lib/x86_64-linux-gnu/libpthread.so.0)

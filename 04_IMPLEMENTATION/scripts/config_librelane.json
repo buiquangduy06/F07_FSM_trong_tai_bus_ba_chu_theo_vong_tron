@@ -1,0 +1,26 @@
+{
+  "//": "F07 — cau hinh LibreLane/OpenLane2. MO RONG TU NGUYEN (Charter muc 3).",
+  "//1": "Cac con so FP_CORE_UTIL / density la DIEM XUAT PHAT, phai dieu chinh theo",
+  "//2": "ket qua that cua lan chay dau tien roi ghi lai vao 06_GDSII/floorplan/.",
+  "DESIGN_NAME": "f07_rr_arbiter",
+  "VERILOG_FILES": [
+    "dir::../rtl/f07_bad_fixed_priority.sv",
+    "dir::../rtl/f07_rr_arbiter.sv",
+    "dir::../rtl/f07_rr_arbiter_wrapper.sv"
+  ],
+  "PNR_SDC_FILE": "dir::../constraints/design.sdc",
+  "SIGNOFF_SDC_FILE": "dir::../constraints/design.sdc",
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 10.0,
+  "PDK": "sky130A",
+  "STD_CELL_LIBRARY": "sky130_fd_sc_hd",
+  "FP_SIZING": "relative",
+  "FP_CORE_UTIL": 40,
+  "PL_TARGET_DENSITY_PCT": 45,
+  "RUN_CTS": true,
+  "RUN_LINTER": true,
+  "RUN_KLAYOUT_DRC": true,
+  "RUN_MAGIC_DRC": true,
+  "RUN_LVS": true,
+  "//3": "RUN_CTS = true vi khoi co clock that."
+}

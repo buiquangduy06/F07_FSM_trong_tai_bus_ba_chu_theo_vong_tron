@@ -1,0 +1,9 @@
+%Warning-UNUSEDSIGNAL: /mnt/c/Users/ADMIN/Downloads/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/F07_FSM_trong_tai_bus_ba_chu_theo_vong_tron/04_IMPLEMENTATION/rtl/f07_rr_arbiter.sv:14:17: Signal is not used: 'selected_id'
+                                                                                                                                                                                         : ... note: In instance 'f07_rr_arbiter'
+   14 |     logic [1:0] selected_id;
+      |                 ^~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.032
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+- V e r i l a t i o n   R e p o r t: Verilator 5.032 2025-01-01 rev (Debian 5.032-1)
+- Verilator: Built from 0.934 MB sources in 450 modules, into 0.022 MB in 5 C++ files needing 0.000 MB
+- Verilator: Walltime 0.110 s (elab=0.015, cvt=0.004, bld=0.000); cpu 0.067 s on 1 threads; alloced 16.164 MB
